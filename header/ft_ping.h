@@ -11,15 +11,7 @@
 # include <string.h>
 # include <sys/socket.h>
 # include <sys/time.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netinet/ip_icmp.h>
-#include <sys/socket.h>
-#include <sys/time.h>
+# include <signal.h>
 
 # define PKT_SIZE 84
 # define DATA_PKT_SIZE (PKT_SIZE - sizeof(struct icmp) - sizeof(time_t))
@@ -57,7 +49,7 @@ typedef struct s_parsing
 
 }   t_parsing;
 
-extern volatile struct s_parsing *ping_parsing;
+extern t_parsing ping_parsing;
 
 typedef struct s_ping_pkt{
     struct icmp hdr;

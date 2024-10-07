@@ -25,7 +25,7 @@ void setup_packet(t_ping_pkt *packet, time_t timestamp) {
     packet->hdr.icmp_cksum = checksum(packet, sizeof(struct icmp) + DATA_PKT_SIZE);
 }
 
-void loop(t_parsing *ping_parsing){
+void loop(){
     struct sockaddr_in addr;
     t_ping_pkt packet;
     struct timeval timestamp;
@@ -39,10 +39,10 @@ void loop(t_parsing *ping_parsing){
     }
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr(ping_parsing->infodest.ip);
+    addr.sin_addr.s_addr = inet_addr(ping_parsing.infodest.ip);
 
     printf("FT_PING %s (%s) %zu(%ld) bytes of data.\n",
-            ping_parsing->infodest.dns, ping_parsing->infodest.ip,
+            ping_parsing.infodest.dns, ping_parsing.infodest.ip,
             DATA_PKT_SIZE + sizeof(struct ip),
             DATA_PKT_SIZE
     );
@@ -57,16 +57,16 @@ void loop(t_parsing *ping_parsing){
             perror("Erreur d'envoi du paquet");
         } else {
             gettimeofday(&timestamp, NULL);
-            // printf("%ld bytes from %s: icmp_seq=%d ttl=64 time=%ld ms\n",
-            //         DATA_PKT_SIZE + sizeof(struct ip),
-            //         ping_parsing->infodest.ip,
-            //         ping_parsing->nb_seq,
-            //         timestamp.tv_sec - packet.timestamp.tv_sec
-            // );
-            printf("Envoi du paquet à %s\n", inet_ntoa(addr.sin_addr));
+            printf("%ld bytes from %s: icmp_seq=%d ttl=64\n",
+                    DATA_PKT_SIZE + sizeof(struct ip),
+                    ping_parsing.infodest.ip,
+                    ping_parsing.nb_seq);
+            ping_parsing.stat.transmitted++;
+            ping_parsing.stat.received++;
+            // printf("Envoi du paquet à %s\n", inet_ntoa(addr.sin_addr));
         }
         sleep(1);
-        ping_parsing->nb_seq++;
+        ping_parsing.nb_seq++;
     }
 
 }

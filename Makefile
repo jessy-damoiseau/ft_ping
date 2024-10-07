@@ -5,12 +5,6 @@
 NAME		=	ft_ping
 
 ################################################################################
-#                               Sources filenames                              #
-################################################################################
-
-C_FILES = $(shell find $(SRCS_DIR) -name '*.c')
-
-################################################################################
 #                         Sources and objects directories                      #
 ################################################################################
 
@@ -19,11 +13,17 @@ OBJS_DIR = objects-dependances
 DEPS_DIR = $(OBJS_DIR)
 
 ################################################################################
+#                               Sources filenames                              #
+################################################################################
+
+C_FILES = $(shell find $(SRCS_DIR) -name '*.c')
+
+################################################################################
 #                              Commands and arguments                          #
 ################################################################################
 
 CC			=	gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -g3
 RM			=	rm -rf
 
 ################################################################################
@@ -33,66 +33,57 @@ RM			=	rm -rf
 _RED		=	\033[31m
 _GREEN		=	\033[32m
 _YELLOW		=	\033[33m
-_CYAN		=	\033[96m
+_CYAN		=	\033[36m
 _NC			=	\033[0m
 
 ################################################################################
-#                                    Objects                                    #
+#                                    Objects                                   #
 ################################################################################
 
 C_OBJS = $(patsubst $(SRCS_DIR)/%.c,$(OBJS_DIR)/%.o,$(C_FILES))
 
-$(shell mkdir -p $($(sort $(dir $(C_OBJS)))))
-
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
-	@ echo "\t$(_YELLOW) compiling... $*.c$(_NC)"
-	@$(CC) $(CFLAGS) $(OPENGL) -c $< -o $@
-
 ################################################################################
-#                                  Dependances                                 #
+#                                  Dépendances                                 #
 ################################################################################
 
 C_DEPS = $(patsubst $(OBJS_DIR)/%.o,$(DEPS_DIR)/%.d,$(C_OBJS))
-DEP_FILES = $(C_DEPS)
-
-$(shell mkdir -p $(sort $(dir $(DEP_FILES))))
-
-$(DEPS_DIR)/%.d: $(SRCS_DIR)/%.c | $(DEPS_DIR)
-	@$(CC) $(CFLAGS) -MM $< -MT $(@:.d=.o) -MF $@
 
 ################################################################################
-#                                   Command                                    #
+#                               Commands and rules                             #
 ################################################################################
 
 all: init $(NAME)
 
 init:
-	@ if test -f $(NAME);\
-		then echo "$(_CYAN)[program already created]$(_NC)";\
-		else \
-		echo "$(_YELLOW)[Initialize program]$(_NC)";\
-		$(shell mkdir -p $($(sort $(dir $(C_OBJS))))) \
-	fi
+	@echo "$(_CYAN)Creating directories if not existing...$(_NC)"
+	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(DEPS_DIR)
+
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
+	@echo "$(_YELLOW)Compiling $<...$(_NC)"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(DEPS_DIR)/%.d: $(SRCS_DIR)/%.c
+	@$(CC) $(CFLAGS) -MM $< -MT $(@:.d=.o) -MF $@
 
 $(NAME): $(C_OBJS)
-	@ echo "\t$(_YELLOW)[Creating program]$(_NC)"
+	@echo "$(_GREEN)Linking $@...$(_NC)"
 	@$(CC) $(CFLAGS) $(C_OBJS) -o $(NAME)
-	@ echo "$(_GREEN)[program created & ready]$(_NC)"
+	@echo "$(_GREEN)$(NAME) created successfully!$(_NC)"
 
 clean:
-	echo "$(_RED)[cleaning up .out & objects files]"
+	@echo "$(_RED)Cleaning up object and dependency files...$(_NC)"
 	@$(RM) $(OBJS_DIR)
-	@$(RM) $(DEPS_DIR)
 
 fclean: clean
-	@ echo "$(_RED)[cleaning up .out, objects & library files]$(_NC)"
+	@echo "$(_RED)Cleaning up the executable...$(_NC)"
 	@$(RM) $(NAME)
 
 re: fclean all
 
-.SILENT:
-		all
+################################################################################
+#                               Special commands                               #
+################################################################################
 
 .PHONY: all clean fclean re
-
--include $(DEP_FILES)
+-include $(C_DEPS)

@@ -12,23 +12,23 @@ void resolve_dns(){
     struct hostent *host;
     struct in_addr **addr_list;
 
-    host = gethostbyname(ping_parsing->dest);
+    host = gethostbyname(ping_parsing.dest);
     if (host == NULL){
         printf("ping: connect: Network is unreachable");
         exit(EXIT_FAILURE);
     }
+    // printf("%s\n", host->h_aliases);
     addr_list = (struct in_addr **)host->h_addr_list;
-    ping_parsing->infodest.ip = inet_ntoa(*addr_list[0]);
-    ping_parsing->infodest.dns = ping_parsing->dest;
+    ping_parsing.infodest.ip = inet_ntoa(*addr_list[0]);
+    ping_parsing.infodest.dns = ping_parsing.dest;
 }
 
 void parser(int ac, char **av){
     int opt;
-    printf("check1");
     while ((opt = getopt(ac, av, "vh")) != -1){
         switch (opt){
             case 'v':
-                ping_parsing->option.isVerbose = true;
+                ping_parsing.option.isVerbose = true;
                 break;
             case 'h':
                 help();
@@ -39,14 +39,10 @@ void parser(int ac, char **av){
                 break;
         }
     }
-    printf("check2");
     if (ac - optind != 1){
         help();
         exit(EXIT_FAILURE);
     }
-    printf("check3");
-    ping_parsing->dest = av[optind];
-    printf("check4");
+    ping_parsing.dest = av[optind];
     resolve_dns();
-    printf("check5");
 }
