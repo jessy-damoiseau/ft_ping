@@ -68,7 +68,7 @@ $(DEPS_DIR)/%.d: $(SRCS_DIR)/%.c
 
 $(NAME): $(C_OBJS)
 	@echo "$(_GREEN)Linking $@...$(_NC)"
-	@$(CC) $(CFLAGS) $(C_OBJS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(C_OBJS) -o $(NAME) -lm
 	@echo "$(_GREEN)$(NAME) created successfully!$(_NC)"
 
 clean:
