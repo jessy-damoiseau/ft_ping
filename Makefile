@@ -9,8 +9,8 @@ NAME		=	ft_ping
 ################################################################################
 
 SRCS_DIR = srcs
-OBJS_DIR = objects-dependances
-DEPS_DIR = $(OBJS_DIR)
+OBJS_DIR = objects
+
 
 ################################################################################
 #                               Sources filenames                              #
@@ -43,12 +43,6 @@ _NC			=	\033[0m
 C_OBJS = $(patsubst $(SRCS_DIR)/%.c,$(OBJS_DIR)/%.o,$(C_FILES))
 
 ################################################################################
-#                                  Dépendances                                 #
-################################################################################
-
-C_DEPS = $(patsubst $(OBJS_DIR)/%.o,$(DEPS_DIR)/%.d,$(C_OBJS))
-
-################################################################################
 #                               Commands and rules                             #
 ################################################################################
 
@@ -57,14 +51,11 @@ all: init $(NAME)
 init:
 	@echo "$(_CYAN)Creating directories if not existing...$(_NC)"
 	@mkdir -p $(OBJS_DIR)
-	@mkdir -p $(DEPS_DIR)
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
 	@echo "$(_YELLOW)Compiling $<...$(_NC)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(DEPS_DIR)/%.d: $(SRCS_DIR)/%.c
-	@$(CC) $(CFLAGS) -MM $< -MT $(@:.d=.o) -MF $@
 
 $(NAME): $(C_OBJS)
 	@echo "$(_GREEN)Linking $@...$(_NC)"

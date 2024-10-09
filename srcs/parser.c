@@ -17,7 +17,6 @@ void resolve_dns(){
         printf("ping: connect: Network is unreachable");
         exit(EXIT_FAILURE);
     }
-    // printf("%s\n", host->h_aliases);
     addr_list = (struct in_addr **)host->h_addr_list;
     ping_parsing.infodest.ip = inet_ntoa(*addr_list[0]);
     ping_parsing.infodest.dns = ping_parsing.dest;

@@ -35,6 +35,8 @@ void init_socket() {
         exit(EXIT_FAILURE);
     }
     setsockopt(ping_parsing.sockfd, IPPROTO_IP, IP_TTL, &TTL_VALUE, sizeof(TTL_VALUE));
+    if (ping_parsing.option.isVerbose)
+        printf("ft_ping: sock4.fd: %d (socktype: SOCK_RAW)\n", ping_parsing.sockfd);
 }
 
 void loop() {
@@ -67,20 +69,14 @@ void loop() {
         if (recvfrom(ping_parsing.sockfd, recv_packet, sizeof(recv_packet), 0, (struct sockaddr *)&r_addr, &addr_len) > 0) {
             ping_parsing.stat.received++;
             gettimeofday(&end, NULL);
-            long long rtt = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0;
+            double rtt = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0;
             recv_icmp_hdr = (struct icmphdr *)(recv_packet + (sizeof(struct iphdr)));
             struct iphdr *ip_hdr = (struct iphdr *)recv_packet;
             ttl = ip_hdr->ttl;
-            printf("%ld bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n", 
-                   sizeof(ping_parsing.packet), inet_ntoa(r_addr.sin_addr),
-                   recv_icmp_hdr->un.echo.sequence, ttl, (float)rtt);
-            if (ping_parsing.stat.min == 0 || rtt < ping_parsing.stat.min)
-                ping_parsing.stat.min = rtt;
-            if (rtt > ping_parsing.stat.max)
-                ping_parsing.stat.max = rtt;
-            ping_parsing.stat.avg = (ping_parsing.stat.avg * (seq - 1) + rtt) / seq;
-            variance = (variance * (seq - 1) + (rtt - ping_parsing.stat.avg) * (rtt - (ping_parsing.stat.avg - (rtt / seq)))) / seq;
-            ping_parsing.stat.mdev = sqrt(variance);
+            if (!strcmp(ping_parsing.infodest.dns, ping_parsing.infodest.ip))
+                variance = print_ip(recv_icmp_hdr, seq, ttl, rtt, variance);
+            else
+                variance = print_dns(recv_icmp_hdr, seq, ttl, rtt, variance);   
         }
         sleep(1);
     }

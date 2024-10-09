@@ -53,8 +53,9 @@ typedef struct s_parsing
 extern t_parsing ping_parsing;
 
 
-
 void parser(int, char**);
 void loop();
+double print_ip(struct icmphdr *recv_icmp_hdr, int seq, int ttl, double rtt, double variance);
+double print_dns(struct icmphdr *recv_icmp_hdr, int seq, int ttl, double rtt, double variance);
 
 #endif
