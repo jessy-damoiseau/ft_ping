@@ -23,24 +23,25 @@ void setup_packet(int seq) {
     icmp_hdr->type = ICMP_ECHO;
     icmp_hdr->code = 0;
     icmp_hdr->un.echo.id = getpid();
-    icmp_hdr->un.echo.sequence = seq;
+    icmp_hdr->un.echo.sequence = ++seq;
     icmp_hdr->checksum = checksum(ping_parsing.packet, sizeof(ping_parsing.packet));
 }
 
 void init_socket() {
-    int TTL_VALUE = 64;
+    int ttl_value = 64;
     ping_parsing.sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (ping_parsing.sockfd < 0) {
         perror("Socket error");
         exit(EXIT_FAILURE);
     }
-    setsockopt(ping_parsing.sockfd, IPPROTO_IP, IP_TTL, &TTL_VALUE, sizeof(TTL_VALUE));
-    if (ping_parsing.option.isVerbose)
-        printf("ft_ping: sock4.fd: %d (socktype: SOCK_RAW)\n", ping_parsing.sockfd);
+    setsockopt(ping_parsing.sockfd, IPPROTO_IP, IP_TTL, &ttl_value, sizeof(ttl_value));
+    if (ping_parsing.option.isVerbose){
+        printf("ft_ping: sock4.fd: %d (socktype: SOCK_RAW), hints.ai_family: AF_UNSPEC\n\n", ping_parsing.sockfd);
+        printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n", ping_parsing.infodest.dns);
+    }
 }
 
 void loop() {
-    int seq = 0;
     double variance = 0;
     struct sockaddr_in addr;
     struct timeval start, end;
@@ -55,7 +56,7 @@ void loop() {
     PACKET_SIZE + (int)sizeof(struct iphdr));
     gettimeofday(&ping_parsing.start, NULL);
     while (true) {
-        setup_packet(seq++);
+        setup_packet(ping_parsing.nb_seq);
         gettimeofday(&start, NULL);
         if (sendto(ping_parsing.sockfd, ping_parsing.packet, sizeof(ping_parsing.packet), 0, (struct sockaddr *)&addr, sizeof(addr)) <= 0) {
             perror("sendto error");
@@ -74,9 +75,9 @@ void loop() {
             struct iphdr *ip_hdr = (struct iphdr *)recv_packet;
             ttl = ip_hdr->ttl;
             if (!strcmp(ping_parsing.infodest.dns, ping_parsing.infodest.ip))
-                variance = print_ip(recv_icmp_hdr, seq, ttl, rtt, variance);
+                variance = print_ip(recv_icmp_hdr, ++ping_parsing.nb_seq, ttl, rtt, variance);
             else
-                variance = print_dns(recv_icmp_hdr, seq, ttl, rtt, variance);   
+                variance = print_dns(recv_icmp_hdr, ++ping_parsing.nb_seq, ttl, rtt, variance);   
         }
         sleep(1);
     }

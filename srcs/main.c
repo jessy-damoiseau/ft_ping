@@ -11,9 +11,10 @@ void sigint_handler(__attribute__((unused))int sig){
             (float)ping_parsing.stat.transmitted) * 100.0,
             (double)(ping_parsing.end.tv_sec - ping_parsing.start.tv_sec) * 1000.0 +
             (double)(ping_parsing.end.tv_usec - ping_parsing.start.tv_usec) / 1000.0);
-    printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
-    ping_parsing.stat.min, ping_parsing.stat.avg,
-    ping_parsing.stat.max, ping_parsing.stat.mdev);
+    if (ping_parsing.nb_seq != 0)
+        printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
+        ping_parsing.stat.min, ping_parsing.stat.avg,
+        ping_parsing.stat.max, ping_parsing.stat.mdev);
 
     close(ping_parsing.sockfd);
     exit(EXIT_SUCCESS);
