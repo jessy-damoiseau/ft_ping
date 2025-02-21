@@ -5,14 +5,12 @@ t_parsing ping_parsing;
 void sigint_handler(__attribute__((unused))int sig){
     gettimeofday(&ping_parsing.end, NULL);
     printf("\n--- %s ping statistics ---\n", ping_parsing.infodest.dns);
-    printf("%d packets transmitted, %d received, %.1f%% packet loss, time %.0lfms\n",
+    printf("%d packets transmitted, %d received, %.1f%% packet loss\n",
             ping_parsing.stat.transmitted, ping_parsing.stat.received, 
             ((ping_parsing.stat.transmitted - ping_parsing.stat.received) /
-            (float)ping_parsing.stat.transmitted) * 100.0,
-            (double)(ping_parsing.end.tv_sec - ping_parsing.start.tv_sec) * 1000.0 +
-            (double)(ping_parsing.end.tv_usec - ping_parsing.start.tv_usec) / 1000.0);
+            (float)ping_parsing.stat.transmitted) * 100.0);
     if (ping_parsing.nb_seq != 0)
-        printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
+        printf("round-trip min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
         ping_parsing.stat.min, ping_parsing.stat.avg,
         ping_parsing.stat.max, ping_parsing.stat.mdev);
 

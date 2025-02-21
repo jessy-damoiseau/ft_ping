@@ -7,6 +7,7 @@
 # include <stdlib.h>
 # include <arpa/inet.h>
 # include <netinet/ip_icmp.h>
+#include <netinet/ip.h>
 # include <netdb.h>
 # include <string.h>
 # include <sys/socket.h>
@@ -14,7 +15,7 @@
 # include <signal.h>
 # include <math.h>
 
-# define PACKET_SIZE 64
+# define PACKET_SIZE 56
 
 typedef struct s_option
 {
@@ -56,6 +57,5 @@ extern t_parsing ping_parsing;
 void parser(int, char**);
 void loop();
 double print_ip(struct icmphdr *recv_icmp_hdr, int seq, int ttl, double rtt, double variance);
-double print_dns(struct icmphdr *recv_icmp_hdr, int seq, int ttl, double rtt, double variance);
 
 #endif

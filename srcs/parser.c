@@ -1,11 +1,18 @@
 #include "../header/ft_ping.h"
 
 void help(){
-    printf("\nUsage\n  ft_ping [options] <destination>\n");
+    printf("\nUsage\n  ft_ping [OPTION...] HOST ...\n");
+    printf("\nSend ICMP ECHO_REQUEST packets to network hosts.\n");
     printf("\nOptions:\n");
     printf("  <destination>  DNS name or IP address\n");
-    printf("  -v             Verbose output\n");
-    printf("  -h             Print help\n");
+    printf("  -v             verbose output\n");
+    printf("  -h             give this help list\n");
+    printf("  -u             give a short usage message\n");
+}
+
+void usage(){
+    printf("Usage: ft_ping [-huv] HOST ...\n");
+    printf("Try 'ft_ping -h' for more information.\n");
 }
 
 void resolve_dns(){
@@ -14,7 +21,7 @@ void resolve_dns(){
 
     host = gethostbyname(ping_parsing.dest);
     if (host == NULL){
-        printf("ping: connect: Network is unreachable");
+        printf("ping: unknown host");
         exit(EXIT_FAILURE);
     }
     addr_list = (struct in_addr **)host->h_addr_list;
@@ -24,13 +31,16 @@ void resolve_dns(){
 
 void parser(int ac, char **av){
     int opt;
-    while ((opt = getopt(ac, av, "vh")) != -1){
+    while ((opt = getopt(ac, av, "vhu")) != -1){
         switch (opt){
             case 'v':
                 ping_parsing.option.isVerbose = true;
                 break;
             case 'h':
                 help();
+                exit(EXIT_SUCCESS);
+            case 'u':
+                usage();
                 exit(EXIT_SUCCESS);
             default:
                 help();
