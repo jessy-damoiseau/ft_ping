@@ -47,7 +47,6 @@ typedef struct s_parsing
     char        *dest;
     int         nb_seq;
     char        packet[PACKET_SIZE];
-    struct      timeval start, end;
 
 }   t_parsing;
 

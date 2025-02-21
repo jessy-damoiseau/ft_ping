@@ -1,7 +1,7 @@
 #include "../header/ft_ping.h"
 
 double print_ip(struct icmphdr *recv_icmp_hdr, int seq, int ttl, double rtt, double variance){
-    printf("%ld bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n", 
+    printf("%ld bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", 
                    sizeof(ping_parsing.packet) + sizeof(*recv_icmp_hdr), ping_parsing.infodest.ip,
                    recv_icmp_hdr->un.echo.sequence, ttl, (float)rtt);
             if (ping_parsing.stat.min == 0 || rtt < ping_parsing.stat.min)
@@ -81,8 +81,6 @@ void loop() {
         printf(", id 0x%x = %d\n", packet_id, packet_id);
     else
         printf("\n");
-    gettimeofday(&ping_parsing.start, NULL);
-    
     while (true) {
         setup_packet(ping_parsing.nb_seq, packet_id);
         gettimeofday(&start, NULL);

@@ -3,7 +3,6 @@
 t_parsing ping_parsing;
 
 void sigint_handler(__attribute__((unused))int sig){
-    gettimeofday(&ping_parsing.end, NULL);
     printf("\n--- %s ping statistics ---\n", ping_parsing.infodest.dns);
     printf("%d packets transmitted, %d received, %.1f%% packet loss\n",
             ping_parsing.stat.transmitted, ping_parsing.stat.received, 
